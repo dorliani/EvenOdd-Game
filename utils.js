@@ -16,10 +16,28 @@ const saveScore = (score) => {
 const checkIfWon = (...players) =>
   players.find((player) => player.points === 3);
 
+const randomPlayers = (length) => {
+  const nums = [];
+  for (let i = 0; i < length; i++) {
+    nums.push(i);
+  }
+  let ranNums = [],
+    i = length,
+    j = 0;
+
+  while (i--) {
+    j = Math.floor(Math.random() * (i + 1));
+    ranNums.push(nums[j]);
+    nums.splice(j, 1);
+  }
+  return [...ranNums];
+};
+
 module.exports = {
   Person,
   getRandomNumber,
   saveScore,
   argv,
+  randomPlayers,
   checkIfWon,
 };

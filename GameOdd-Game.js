@@ -5,36 +5,41 @@ const {
   saveScore,
   argv,
   checkIfWon,
+  randomPlayers,
 } = require("./utils");
 
-const player1 = new Person(argv.player1);
-const player2 = new Person(argv.player2);
-
-const game = () => {
+const game = (...players) => {
   let msgs = [];
   let msg = "";
   let round = 0;
+  const copy = [...players];
 
   const timer = setInterval(() => {
     const number = getRandomNumber();
 
+    if (players.length > 2) {
+      const [ind1, ind2] = randomPlayers(players.length);
+      players[0] = copy[ind1];
+      players[1] = copy[ind2];
+    }
+
     msg = `Round #${++round}, random number is ${number}, `;
 
     if (number % 2 === 0) {
-      player1.points++;
-      msg += `${player1.name} Scored!`;
+      players[0].points++;
+      msg += `${players[0].name} Scored!`;
     } else {
-      player2.points++;
-      msg += `${player2.name} Scored!`;
+      players[1].points++;
+      msg += `${players[1].name} Scored!`;
     }
 
-    let status = `Status ${player1.name} ${player1.points}, ${player2.name} ${player2.points}`;
+    let status = `Status ${players[0].name} ${players[0].points}, ${players[1].name} ${players[1].points}`;
 
     console.log(chalk.green(msg) + "\n" + chalk.underline(status));
 
     msgs.push(msg, status);
 
-    let winner = checkIfWon(player1, player2);
+    let winner = checkIfWon(players[0], players[1]);
 
     if (winner) {
       clearInterval(timer);
@@ -44,4 +49,14 @@ const game = () => {
   }, 1000);
 };
 
-game();
+if (argv._.length >= 2) {
+  const objs = [];
+  for (const [i, val] of argv._.entries()) {
+    objs[i] = new Person(val);
+  }
+  game(...objs);
+} else {
+  const player1 = new Person(argv.player1);
+  const player2 = new Person(argv.player2);
+  game(player1, player2);
+}

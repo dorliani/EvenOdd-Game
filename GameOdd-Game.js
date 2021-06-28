@@ -8,6 +8,8 @@ const {
   randomPlayers,
 } = require("./utils");
 
+let bossFlag = true;
+
 const game = (...players) => {
   let msgs = [];
   let msg = "";
@@ -25,10 +27,16 @@ const game = (...players) => {
 
     msg = `Round #${++round}, random number is ${number}, `;
 
-    if (number % 2 === 0) {
+    if (
+      (players[1].name === "Boss" && number % 2 === 0 && number >= 0) ||
+      (number % 2 === 0 && players[1].name !== "Boss")
+    ) {
       players[0].points++;
       msg += `${players[0].name} Scored!`;
-    } else {
+    } else if (
+      (players[1].name === "Boss" && number % 2 !== 0) ||
+      (players[1].name !== "Boss" && number % 2 !== 0)
+    ) {
       players[1].points++;
       msg += `${players[1].name} Scored!`;
     }
@@ -45,6 +53,13 @@ const game = (...players) => {
       clearInterval(timer);
       console.log(chalk.bgGreen(`${winner.name} Wins !`));
       saveScore(msgs);
+
+      if (bossFlag) {
+        const boss = new Person("Boss");
+        winner.points = 0;
+        game(winner, boss);
+        bossFlag = false;
+      }
     }
   }, 1000);
 };
